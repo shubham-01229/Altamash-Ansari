@@ -1,0 +1,195 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design Tokens ─── */
+:root {
+  --primary:      #00BCEB;   /* cyan accent */
+  --ocean:        #1A6FA8;
+  --deep-teal:    #0A2540;
+  --ice-cyan:     #B5E8FA;
+  --cloud:        #E8F4FF;
+
+  --glass-bg:     rgba(255, 255, 255, 0.06);
+  --glass-bg-md:  rgba(255, 255, 255, 0.10);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-blur:   20px;
+
+  --radius-panel: 32px;
+  --radius-card:  24px;
+  --radius-pill:  100px;
+
+  --shadow-panel: 0 32px 80px rgba(0, 10, 30, 0.70);
+  --shadow-card:  0 8px  32px rgba(0, 15, 40, 0.40);
+  --shadow-glow:  0 0   48px rgba(0, 188, 235, 0.22);
+}
+
+/* ─── Base Resets ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #071527 0%, #0B1F3A 50%, #0E2D52 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── Typography ─── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 188, 235, 0.4);
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 188, 235, 0.7);
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: rgba(0, 188, 235, 0.3);
+  color: #00658C;
+}
+
+/* ─────────────────────────────────────────
+   GLASS COMPONENTS
+   (No CSS nesting — Tailwind v3 compatible)
+───────────────────────────────────────── */
+@layer components {
+
+  /* Frosted glass surface — lightweight, no backdrop-blur for perf */
+  .glass {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-md {
+    background: var(--glass-bg-md);
+    border: 1px solid var(--glass-border);
+  }
+
+  /* Only use blur on specific hero-level elements, never on grids */
+  .glass-blur {
+    background: var(--glass-bg-md);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* ── Buttons ── */
+
+  /* Primary solid button — white pill */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-full;
+    @apply bg-[#00BCEB] text-white font-bold text-sm tracking-wider uppercase;
+    @apply shadow-[0_8px_32px_rgba(0,188,235,0.25)] transition-all duration-300;
+  }
+  .btn-primary:hover {
+    @apply shadow-[0_0_48px_rgba(0,188,235,0.4)] scale-105 brightness-110;
+  }
+
+  /* Ghost button — transparent border pill */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-full;
+    @apply font-semibold text-sm tracking-wider uppercase text-white/75;
+    @apply border border-white/15 transition-all duration-200;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .btn-ghost:hover {
+    @apply bg-white/10 text-white border-white/30;
+  }
+
+  /* ── Typography helpers ── */
+
+  /* Small all-caps label above headings */
+  .section-overline {
+    @apply font-semibold text-xs tracking-[0.15em] uppercase;
+    color: rgba(181, 241, 250, 0.9);
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* Section heading */
+  .section-heading {
+    @apply font-bold text-white leading-tight;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* Dashed placeholder box */
+  .placeholder-box {
+    @apply border-2 border-dashed border-white/30 rounded-3xl;
+    @apply flex flex-col items-center justify-center gap-3;
+    @apply bg-white/5 text-white/40 text-xs tracking-widest uppercase;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+/* ─── Page Transitions ─── */
+.page-enter {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 400ms ease-out, transform 400ms ease-out;
+}
+
+/* ─── Sparkle dot ─── */
+.sparkle-dot {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  animation: sparkle 3s ease-in-out infinite;
+}
+
+/* ─── Scroll line ─── */
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+/* ─── Keyframes ─── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.3); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.6; transform: translateY(0); }
+  50%       { opacity: 1;   transform: translateY(6px); }
+}
