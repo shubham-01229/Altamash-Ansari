@@ -20,29 +20,29 @@ const contactDetails = [
   {
     icon: Mail,
     label: 'Email',
-    value: '[email@placeholder.com]',
-    href: 'mailto:email@placeholder.com',
+    value: 'altamashansariwork@gmail.com',
+    href: 'mailto:altamashansariwork@gmail.com',
     note: 'Replace with real email',
   },
   {
     icon: Phone,
     label: 'Phone / WhatsApp',
-    value: '[+91 XXXXX XXXXX]',
-    href: '#',
+    value: '+91 93217 85633',
+    href: 'https://wa.me/9321785633',
     note: 'Replace with WhatsApp number',
   },
   {
     icon: Linkedin,
     label: 'LinkedIn',
     value: 'Altamash Ansari',
-    href: '#',
+    href: 'https://www.linkedin.com/in/altamash-ansari-154759256?utm_source=share_via&utm_content=profile&utm_medium=member_android',
     note: 'Replace with LinkedIn profile URL',
   },
   {
     icon: Instagram,
     label: 'Instagram',
-    value: '@[handle]',
-    href: '#',
+    value: '@altamashh.ansarii',
+    href: 'https://www.instagram.com/altamashh.ansarii',
     note: 'Replace with Instagram handle',
   },
 ]
@@ -318,7 +318,7 @@ export default function Contact() {
               </h3>
               {/* Replace href="/cv/altamash-ansari-cv.pdf" when CV file is ready */}
               <PrimaryButton
-                href="/cv/altamash-ansari-cv.pdf"
+                href="src\assets\altamash-cv.jpeg"
                 variant="ghost"
                 size="sm"
                 className="w-full justify-center"

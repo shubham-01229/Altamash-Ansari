@@ -1,30 +1,42 @@
 // src/pages/Portfolio.jsx
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight, X, Play, Pause, Volume2, VolumeX } from 'lucide-react'
+import { ArrowUpRight, X, Play, Pause, Volume2, VolumeX, Instagram } from 'lucide-react'
 import GlassCard from '../components/ui/GlassCard'
 import PrimaryButton from '../components/ui/PrimaryButton'
 import { fadeUp, staggerContainer } from '../hooks/useScrollReveal'
 import { portfolioProjects, portfolioFilters } from '../data/portfolio'
 import { cn } from '../utils/cn'
 
-/* ─── Portfolio Card with 9:16 video thumbnail ─── */
+/* ——— Creator Avatar with fallback ——— */
+function CreatorAvatar({ handle, name, size = 24 }) {
+  const [imgError, setImgError] = useState(false)
+  const avatarUrl = `https://unavatar.io/instagram/${handle}`
+
+  return (
+    <div
+      className="rounded-full overflow-hidden bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0"
+      style={{ width: size, height: size }}
+    >
+      {!imgError ? (
+        <img
+          src={avatarUrl}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={() => setImgError(true)}
+          loading="lazy"
+        />
+      ) : (
+        <span className="text-primary font-bold" style={{ fontSize: size * 0.375 }}>
+          {name[0]}
+        </span>
+      )}
+    </div>
+  )
+}
+
+/* ─── Portfolio Card — static thumbnail, click to open ─── */
 function PortfolioCard({ project, onClick }) {
-  const videoRef = useRef(null)
-
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0
-      videoRef.current.play().catch(() => {})
-    }
-  }
-  const handleMouseLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.pause()
-      videoRef.current.currentTime = 0
-    }
-  }
-
   return (
     <GlassCard
       hover
@@ -34,20 +46,15 @@ function PortfolioCard({ project, onClick }) {
         project.featured && 'border-white/35',
       )}
     >
-      {/* 9:16 Video Thumbnail */}
-      <div
-        className="aspect-[9/16] w-full rounded-2xl overflow-hidden relative bg-navy/50"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+      {/* 3:4 Video Thumbnail — no autoplay */}
+      <div className="aspect-[3/4] w-full rounded-2xl overflow-hidden relative bg-navy/50">
         {project.videoSrc ? (
           <>
             <video
-              ref={videoRef}
               src={project.videoSrc}
               muted
               playsInline
-              preload="none"
+              preload="metadata"
               className="w-full h-full object-cover object-top"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -56,14 +63,10 @@ function PortfolioCard({ project, onClick }) {
                 <Play size={20} className="text-white ml-0.5" fill="white" />
               </div>
             </div>
-            {/* Creator overlay */}
+            {/* Creator avatar + name overlay */}
             <div className="absolute bottom-3 left-3 right-3">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-                  <span className="text-primary font-bold text-[9px]">
-                    {project.creatorsInvolved?.[0] || project.brand[0]}
-                  </span>
-                </div>
+                <CreatorAvatar handle={project.instagramHandle} name={project.creatorsInvolved || project.brand} size={24} />
                 <span className="font-heading font-semibold text-white text-xs truncate">
                   {project.creatorsInvolved || project.brand}
                 </span>
@@ -93,25 +96,25 @@ function PortfolioCard({ project, onClick }) {
       </div>
 
       {/* Project Title */}
-      <h3 className="font-heading font-bold text-white text-lg leading-snug group-hover:text-ice-cyan transition-colors duration-200">
+      <h3 className="font-heading font-bold text-white text-base sm:text-lg leading-snug group-hover:text-ice-cyan transition-colors duration-200">
         {project.title}
       </h3>
 
       {/* Brand | My Role */}
       <div className="grid grid-cols-2 gap-3 text-xs font-body">
-        <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+        <div className="bg-white/5 rounded-xl p-2.5 sm:p-3 border border-white/10">
           <span className="font-heading font-semibold text-white/40 text-[9px] tracking-widest uppercase block mb-1">
             Brand
           </span>
-          <span className="text-white/85 font-medium truncate block">
+          <span className="text-white/85 font-medium truncate block text-[11px] sm:text-xs">
             {project.brand}
           </span>
         </div>
-        <div className="bg-white/5 rounded-xl p-3 border border-white/10">
+        <div className="bg-white/5 rounded-xl p-2.5 sm:p-3 border border-white/10">
           <span className="font-heading font-semibold text-white/40 text-[9px] tracking-widest uppercase block mb-1">
             My Role
           </span>
-          <span className="text-white/85 font-medium truncate block">
+          <span className="text-white/85 font-medium truncate block text-[11px] sm:text-xs">
             {project.myRole}
           </span>
         </div>
@@ -122,11 +125,17 @@ function PortfolioCard({ project, onClick }) {
         {project.objective}
       </p>
 
-      {/* View Case Study */}
-      <div className="flex items-center gap-1.5 text-ice-cyan font-heading font-semibold text-xs tracking-wider uppercase pt-1 mt-auto">
-        <span>View Case Study</span>
-        <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-      </div>
+      {/* Instagram handle link */}
+      <a
+        href={`https://www.instagram.com/${project.instagramHandle}/`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1.5 text-white/50 hover:text-pink-400 transition-colors font-heading font-semibold text-xs tracking-wider pt-1 mt-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Instagram size={13} className="text-pink-400/70" />
+        <span>@{project.instagramHandle}</span>
+      </a>
     </GlassCard>
   )
 }
@@ -191,9 +200,9 @@ function CaseStudyModal({ project, onClose }) {
             <X size={16} />
           </button>
 
-          {/* Video Player */}
+          {/* Video Player — click to play, no autoplay */}
           {project.videoSrc ? (
-            <div className="aspect-[9/16] max-h-[50vh] w-full rounded-2xl overflow-hidden relative bg-black mb-6">
+            <div className="aspect-[3/4] max-h-[50vh] w-full rounded-2xl overflow-hidden relative bg-black mb-6">
               <video
                 ref={videoRef}
                 src={project.videoSrc}
@@ -229,10 +238,27 @@ function CaseStudyModal({ project, onClose }) {
               </div>
             </div>
           ) : (
-            <div className="aspect-[9/16] max-h-[50vh] w-full rounded-2xl border-2 border-dashed border-white/20 flex items-center justify-center bg-white/5 mb-6">
+            <div className="aspect-[3/4] max-h-[50vh] w-full rounded-2xl border-2 border-dashed border-white/20 flex items-center justify-center bg-white/5 mb-6">
               <Play size={28} className="text-ice-cyan/70" />
             </div>
           )}
+
+          {/* Creator info */}
+          <div className="flex items-center gap-3 mb-4">
+            <CreatorAvatar handle={project.instagramHandle} name={project.creatorsInvolved || project.brand} size={32} />
+            <div>
+              <span className="font-heading font-bold text-white text-sm">{project.creatorsInvolved || project.brand}</span>
+              <a
+                href={`https://www.instagram.com/${project.instagramHandle}/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-white/50 text-xs hover:text-pink-400 transition-colors"
+              >
+                <Instagram size={10} className="text-pink-400/70" />
+                @{project.instagramHandle}
+              </a>
+            </div>
+          </div>
 
           <span className="font-heading font-semibold text-xs tracking-[0.15em] uppercase text-ice-cyan block mb-2">
             {project.category}
@@ -296,7 +322,7 @@ export default function Portfolio() {
           <span className="font-heading font-semibold text-xs tracking-[0.15em] uppercase text-ice-cyan/90 block mb-3">
             Selected Work
           </span>
-          <h1 className="font-heading font-bold text-white text-4xl sm:text-5xl lg:text-6xl leading-tight mb-4">
+          <h1 className="font-heading font-bold text-white text-3xl sm:text-4xl lg:text-5xl xl:text-6xl leading-tight mb-4">
             Portfolio &amp; Campaigns
           </h1>
           <p className="font-body text-sm sm:text-base text-white/70 leading-relaxed max-w-xl mx-auto">
@@ -306,7 +332,7 @@ export default function Portfolio() {
 
         {/* Filter Tabs */}
         <motion.div
-          className="flex items-center gap-2.5 overflow-x-auto pb-3 mb-10 justify-start sm:justify-center"
+          className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-3 mb-10 justify-start sm:justify-center"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
@@ -319,7 +345,7 @@ export default function Portfolio() {
                 type="button"
                 onClick={() => setActiveFilter(filter)}
                 className={cn(
-                  'font-heading font-semibold text-xs tracking-wider uppercase px-5 py-2.5 rounded-full border transition-all duration-200 whitespace-nowrap shrink-0',
+                  'font-heading font-semibold text-[11px] sm:text-xs tracking-wider uppercase px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border transition-all duration-200 whitespace-nowrap shrink-0',
                   isActive
                     ? 'bg-white text-deep-teal border-white shadow-card'
                     : 'text-white/75 border-white/20 bg-white/5 hover:bg-white/10 hover:text-white hover:border-white/35'
@@ -331,8 +357,8 @@ export default function Portfolio() {
           })}
         </motion.div>
 
-        {/* Project Grid — 2 cols on md, 3 on lg for 9:16 cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Project Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <AnimatePresence mode="popLayout">
             {filtered.map((project, i) => (
               <motion.div

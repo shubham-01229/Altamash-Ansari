@@ -1,5 +1,5 @@
 // src/pages/Home.jsx
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   ArrowUpRight,
@@ -10,6 +10,7 @@ import {
   Target,
   Users,
   Handshake,
+  Instagram,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import FloatingPanel from '../components/ui/FloatingPanel'
@@ -59,45 +60,51 @@ const services = [
   },
 ]
 
-/* â”€â”€â”€ Featured Campaign Card with video preview â”€â”€â”€ */
+/* ——— Creator Avatar with fallback ——— */
+function CreatorAvatar({ handle, name, size = 24 }) {
+  const [imgError, setImgError] = useState(false)
+  const avatarUrl = `https://unavatar.io/instagram/${handle}`
+
+  return (
+    <div
+      className="rounded-full overflow-hidden bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0"
+      style={{ width: size, height: size }}
+    >
+      {!imgError ? (
+        <img
+          src={avatarUrl}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={() => setImgError(true)}
+          loading="lazy"
+        />
+      ) : (
+        <span className="text-primary font-bold" style={{ fontSize: size * 0.375 }}>
+          {name[0]}
+        </span>
+      )}
+    </div>
+  )
+}
+
+/* ——— Featured Campaign Card — static thumbnail, click to portfolio ——— */
 function FeaturedCampaignCard({ project, index }) {
-  const videoRef = useRef(null)
-  const [hovering, setHovering] = useState(false)
-
-  const handleMouseEnter = () => {
-    setHovering(true)
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0
-      videoRef.current.play().catch(() => {})
-    }
-  }
-  const handleMouseLeave = () => {
-    setHovering(false)
-    if (videoRef.current) {
-      videoRef.current.pause()
-      videoRef.current.currentTime = 0
-    }
-  }
-
   return (
     <motion.div variants={fadeUp} custom={index * 0.1}>
       <Link
-        to="/media"
+        to="/portfolio"
         className="block group h-full"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
       >
         <GlassCard hover className="h-full flex flex-col gap-4">
-          {/* Video Thumbnail Preview */}
-          <div className="aspect-[9/16] max-h-[320px] rounded-2xl overflow-hidden relative bg-navy">
+          {/* Static Video Thumbnail — no autoplay */}
+          <div className="aspect-[3/4] rounded-2xl overflow-hidden relative bg-navy">
             {project.videoSrc ? (
               <>
                 <video
-                  ref={videoRef}
                   src={project.videoSrc}
                   muted
                   playsInline
-                  preload="none"
+                  preload="metadata"
                   className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                 />
                 {/* Gradient overlay */}
@@ -133,10 +140,18 @@ function FeaturedCampaignCard({ project, index }) {
           <p className="font-body text-white/55 text-xs leading-relaxed flex-1">
             {project.objective}
           </p>
-          <div className="flex items-center gap-1.5 text-white/50 group-hover:text-white transition-colors">
-            <Play size={11} fill="currentColor" />
-            <span className="font-heading font-semibold text-xs">Watch Campaign</span>
-            <ArrowUpRight size={13} />
+          {/* Instagram handle instead of "Watch Campaign" */}
+          <div
+            className="flex items-center gap-2 text-white/50 group-hover:text-pink-400 transition-colors"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              window.open(`https://www.instagram.com/${project.instagramHandle}/`, '_blank')
+            }}
+          >
+            <CreatorAvatar handle={project.instagramHandle} name={project.creatorsInvolved || project.brand} size={20} />
+            <Instagram size={12} className="text-pink-400/70" />
+            <span className="font-heading font-semibold text-xs">@{project.instagramHandle}</span>
           </div>
         </GlassCard>
       </Link>
@@ -147,7 +162,7 @@ function FeaturedCampaignCard({ project, index }) {
 export default function Home() {
   return (
     <div className="min-h-screen">
-      {/* â”€â”€ HERO SECTION â”€â”€ */}
+      {/* —— HERO SECTION —— */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-24 pb-20">
         {/* Atmospheric background glow */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -170,7 +185,7 @@ export default function Home() {
         <div className="relative w-full max-w-6xl mx-auto">
           {/* Floating Panel with stacked layers */}
           <FloatingPanel>
-            <div className="relative min-h-[660px] md:min-h-[720px] flex flex-col">
+            <div className="relative min-h-[520px] sm:min-h-[600px] md:min-h-[720px] flex flex-col">
               {/* Sparkle decorations — CSS animation, no JS */}
               {sparkles.map((s, i) => (
                 <div
@@ -195,7 +210,7 @@ export default function Home() {
                 }}
               />
 
-              {/* â”€â”€ OVERSIZED HERO NAME â”€â”€ */}
+              {/* —— OVERSIZED HERO NAME —— */}
               <div className="absolute inset-0 flex items-center justify-center overflow-hidden select-none pointer-events-none">
                 <span
                   className="font-heading font-bold text-white/[0.08] uppercase tracking-tight whitespace-nowrap"
@@ -205,13 +220,13 @@ export default function Home() {
                 </span>
               </div>
 
-              {/* â”€â”€ PORTRAIT â€” Altamash Ansari â”€â”€ */}
+              {/* —— PORTRAIT – Altamash Ansari —— */}
               <motion.div
                 className="absolute bottom-0 z-10 pointer-events-none"
                 style={{
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  width: 'clamp(320px, 42vw, 580px)',
+                  width: 'clamp(260px, 42vw, 580px)',
                 }}
                 initial={{ opacity: 0, y: 40, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -223,7 +238,7 @@ export default function Home() {
               >
                 <img
                   src={altamashImg}
-                  alt="Altamash Ansari â€” Influencer Marketing Expert"
+                  alt="Altamash Ansari – Influencer Marketing Expert"
                   className="w-full h-auto object-contain object-bottom select-none"
                   style={{
                     display: 'block',
@@ -238,9 +253,9 @@ export default function Home() {
                 />
               </motion.div>
 
-              {/* â”€â”€ LEFT CONTENT â”€â”€ */}
+              {/* —— LEFT CONTENT —— */}
               <motion.div
-                className="absolute bottom-10 left-8 md:left-12 z-20 max-w-[280px] md:max-w-[340px] lg:max-w-[380px]"
+                className="absolute bottom-6 sm:bottom-10 left-4 sm:left-8 md:left-12 z-20 max-w-[220px] sm:max-w-[280px] md:max-w-[340px] lg:max-w-[380px]"
                 initial="hidden"
                 animate="visible"
                 variants={staggerContainer}
@@ -255,14 +270,14 @@ export default function Home() {
                 <motion.h1
                   variants={fadeUp}
                   custom={0.4}
-                  className="font-heading font-bold text-white text-2xl md:text-3xl lg:text-4xl leading-tight mb-3"
+                  className="font-heading font-bold text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl leading-tight mb-3"
                 >
                   Connecting Brands<br />with Creators.
                 </motion.h1>
                 <motion.p
                   variants={fadeUp}
                   custom={0.5}
-                  className="font-body text-white/60 text-xs md:text-sm leading-relaxed mb-4"
+                  className="font-body text-white/60 text-[11px] sm:text-xs md:text-sm leading-relaxed mb-4"
                 >
                   Results-driven Influencer Marketing Manager with 3+ years driving campaigns that matter.
                 </motion.p>
@@ -285,9 +300,9 @@ export default function Home() {
                 </motion.div>
               </motion.div>
 
-              {/* â”€â”€ RIGHT CONTENT â€” Badges â”€â”€ */}
+              {/* —— RIGHT CONTENT – Badges (hidden on very small screens) —— */}
               <motion.div
-                className="absolute bottom-10 right-8 md:right-12 z-20 flex flex-col items-end gap-3"
+                className="absolute bottom-6 sm:bottom-10 right-4 sm:right-8 md:right-12 z-20 hidden sm:flex flex-col items-end gap-3"
                 initial="hidden"
                 animate="visible"
                 variants={staggerContainer}
@@ -344,9 +359,9 @@ export default function Home() {
                 </motion.div>
               </motion.div>
 
-              {/* â”€â”€ SCROLL INDICATOR â”€â”€ */}
+              {/* —— SCROLL INDICATOR —— */}
               <motion.div
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1"
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 hidden md:flex flex-col items-center gap-1"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.2, duration: 0.6 }}
@@ -360,17 +375,17 @@ export default function Home() {
             </div>
           </FloatingPanel>
 
-          {/* â”€â”€ STATS STRIP BELOW HERO PANEL â”€â”€ */}
+          {/* —— STATS STRIP BELOW HERO PANEL —— */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="flex flex-wrap justify-center gap-3 mt-6"
+            className="flex flex-wrap justify-center gap-2 sm:gap-3 mt-6"
           >
             {heroStats.map((stat) => (
               <div
                 key={stat}
-                className="glass border border-white/25 rounded-full px-5 py-2.5 font-heading text-white text-sm font-semibold shadow-card hover:bg-white/20 transition-all"
+                className="glass border border-white/25 rounded-full px-3 sm:px-5 py-2 sm:py-2.5 font-heading text-white text-xs sm:text-sm font-semibold shadow-card hover:bg-white/20 transition-all"
               >
                 {stat}
               </div>
@@ -379,7 +394,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* â”€â”€ WHAT I DO / SERVICES SECTION â”€â”€ */}
+      {/* —— WHAT I DO / SERVICES SECTION —— */}
       <section className="px-4 py-16 md:py-24 max-w-6xl mx-auto">
         <SectionHeading
           overline="Services"
@@ -392,7 +407,7 @@ export default function Home() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
+          viewport={{ once: true, amount: 0.1 }}
           variants={staggerContainer}
         >
           {services.map((service, index) => (
@@ -415,7 +430,7 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* â”€â”€ FEATURED PROJECTS PREVIEW â”€â”€ */}
+      {/* —— FEATURED PROJECTS PREVIEW —— */}
       <section className="px-4 pb-24 max-w-6xl mx-auto">
         <div className="mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <SectionHeading
@@ -434,10 +449,10 @@ export default function Home() {
         </div>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+          className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
+          viewport={{ once: true, amount: 0.1 }}
           variants={staggerContainer}
         >
           {portfolioProjects.slice(0, 3).map((project, i) => (
@@ -446,12 +461,12 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* â”€â”€ CTA BANNER SECTION â”€â”€ */}
+      {/* —— CTA BANNER SECTION —— */}
       <section className="px-4 pb-24 max-w-6xl mx-auto">
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
+          viewport={{ once: true, amount: 0.1 }}
           variants={fadeUp}
         >
           <GlassCard
@@ -474,7 +489,7 @@ export default function Home() {
               Ready to build something influential?
             </h2>
             <p className="font-body text-white/70 text-sm md:text-base max-w-xl mx-auto mb-8">
-              Whether launching a new product, scaling community reach, or orchestrating multi-creator campaigns â€” let's connect.
+              Whether launching a new product, scaling community reach, or orchestrating multi-creator campaigns – let's connect.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <PrimaryButton

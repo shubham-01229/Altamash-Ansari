@@ -13,9 +13,9 @@ const navLinks = [
 ]
 
 const socialLinks = [
-  { icon: Instagram, href: '#', label: 'Instagram' },   // Replace # with real URL
-  { icon: Linkedin,  href: '#', label: 'LinkedIn'  },   // Replace # with real URL
-  { icon: Mail,      href: 'mailto:your@email.com', label: 'Email' },  // Replace
+  { icon: Instagram, href: 'https://www.instagram.com/altamashh.ansarii', label: 'Instagram' },   // Replace # with real URL
+  { icon: Linkedin,  href: 'https://www.linkedin.com/in/altamash-ansari-154759256?utm_source=share_via&utm_content=profile&utm_medium=member_android', label: 'LinkedIn'  },   // Replace # with real URL
+  { icon: Mail,      href: 'mailto:altamashansariwork@gmail.com', label: 'Email' },  // Replace
 ]
 
 export default function Footer() {

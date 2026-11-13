@@ -2,29 +2,30 @@
 // Real influencer video assets from Altamash Ansari's campaigns
 
 // ── Video imports ──
-import videoJannat     from '../assets/jannat zubair OZ 2.mp4'
-import videoAman       from '../assets/Aman Sharma.mp4'
-import videoElvish     from '../assets/elvsh.mp4'
-import videoFaisu      from '../assets/faisu flipklart brand reel pakg v3.mp4'
-import videoShivam     from '../assets/Shivam Malik_.mp4'
-import videoKuldeep1   from '../assets/Kuldeep 1.mp4'
-import videoKuldeep2   from '../assets/Kuldeep 2.mp4'
-import videoKataria    from '../assets/Kataria_.mp4'
-import videoNazim      from '../assets/Nazim Ahmed.mp4'
-import videoZayn       from '../assets/Zayn round 2 hell.mp4'
+import videoJannat from '../assets/jannat zubair OZ 2.mp4'
+import videoAman from '../assets/Aman Sharma.mp4'
+import videoElvish from '../assets/elvsh.mp4'
+import videoFaisu from '../assets/faisu flipklart brand reel pakg v3.mp4'
+import videoShivam from '../assets/Shivam Malik_.mp4'
+import videoKuldeep1 from '../assets/Kuldeep 1.mp4'
+import videoKuldeep2 from '../assets/Kuldeep 2.mp4'
+import videoKataria from '../assets/Kataria_.mp4'
+import videoNazim from '../assets/Nazim Ahmed.mp4'
+import videoZayn from '../assets/Zayn round 2 hell.mp4'
 import videoMotivation from '../assets/A 2 Motivation_.mp4'
-import videoOfferzone  from '../assets/offerzone sale video.mov'
-import videoSajid      from '../assets/its_sajid_shaikh_20261009_040404138.mp4'
-import videoShivam2    from '../assets/shivammalik09_20261009_040210327.mp4'
-import videoKuldeep3   from '../assets/thekuldeepsinghania_20261009_040247318.mp4'
-import videoRajat      from '../assets/rajat_9629_20261009_040347094.mp4'
-import videoJJ         from '../assets/jj_mobile_world_20261009_040330631.mp4'
+import videoOfferzone from '../assets/offerzone sale video.mov'
+import videoSajid from '../assets/its_sajid_shaikh_20261009_040404138.mp4'
+import videoShivam2 from '../assets/shivammalik09_20261009_040210327.mp4'
+import videoKuldeep3 from '../assets/thekuldeepsinghania_20261009_040247318.mp4'
+import videoRajat from '../assets/rajat_9629_20261009_040347094.mp4'
+import videoJJ from '../assets/jj_mobile_world_20261009_040330631.mp4'
 
 export const influencerVideos = [
   {
     id: 'vid-jannat',
     title: 'Offerzone x Jannat Zubair',
     creator: 'Jannat Zubair',
+    instagramHandle: 'jannatzubair29',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoJannat,
@@ -37,6 +38,7 @@ export const influencerVideos = [
     id: 'vid-aman',
     title: 'Campaign — Aman Sharma',
     creator: 'Aman Sharma',
+    instagramHandle: 'amansharma_0000',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoAman,
@@ -49,6 +51,7 @@ export const influencerVideos = [
     id: 'vid-elvish',
     title: 'Campaign — Elvish Yadav',
     creator: 'Elvish Yadav',
+    instagramHandle: 'elvish_yadav',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoElvish,
@@ -61,6 +64,7 @@ export const influencerVideos = [
     id: 'vid-faisu',
     title: 'Flipkart Brand Reel — Faisu',
     creator: 'Faisu (Mr. Faisu)',
+    instagramHandle: 'mr_faisu_07',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoFaisu,
@@ -73,6 +77,7 @@ export const influencerVideos = [
     id: 'vid-shivam',
     title: 'Campaign — Shivam Malik',
     creator: 'Shivam Malik',
+    instagramHandle: 'shivammalik09',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoShivam,
@@ -85,6 +90,7 @@ export const influencerVideos = [
     id: 'vid-kuldeep',
     title: 'Campaign — Kuldeep Singhania',
     creator: 'Kuldeep Singhania',
+    instagramHandle: 'thekuldeepsinghania',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoKuldeep1,
@@ -97,6 +103,7 @@ export const influencerVideos = [
     id: 'vid-kataria',
     title: 'Campaign — Kataria',
     creator: 'Kataria',
+    instagramHandle: 'corrupt_tuber',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoKataria,
@@ -109,6 +116,7 @@ export const influencerVideos = [
     id: 'vid-nazim',
     title: 'Campaign — Nazim Ahmed',
     creator: 'Nazim Ahmed',
+    instagramHandle: 'nazim4hmed',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoNazim,
@@ -121,6 +129,7 @@ export const influencerVideos = [
     id: 'vid-offerzone',
     title: 'Offerzone Sale Campaign',
     creator: 'Offerzone',
+    instagramHandle: 'offerzone_deal',
     platform: 'Telegram / Instagram',
     aspectRatio: '16:9',
     videoSrc: videoOfferzone,
@@ -133,6 +142,7 @@ export const influencerVideos = [
     id: 'vid-zayn',
     title: 'Campaign — Zayn',
     creator: 'Zayn',
+    instagramHandle: 'round2hell',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoZayn,
@@ -145,6 +155,7 @@ export const influencerVideos = [
     id: 'vid-motivation',
     title: 'Campaign — A2 Motivation',
     creator: 'A2 Motivation',
+    instagramHandle: 'arvind.aroraj',
     platform: 'YouTube',
     aspectRatio: '9:16',
     videoSrc: videoMotivation,
@@ -157,6 +168,7 @@ export const influencerVideos = [
     id: 'vid-sajid',
     title: 'Campaign — Sajid Shaikh',
     creator: 'Sajid Shaikh',
+    instagramHandle: 'its_sajid_shaikh',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoSajid,
@@ -169,6 +181,7 @@ export const influencerVideos = [
     id: 'vid-shivam2',
     title: 'Campaign — Shivam Malik (Reel 2)',
     creator: 'Shivam Malik',
+    instagramHandle: 'shivammalik09',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoShivam2,
@@ -181,6 +194,7 @@ export const influencerVideos = [
     id: 'vid-kuldeep2',
     title: 'Campaign — Kuldeep Singhania (Reel 2)',
     creator: 'Kuldeep Singhania',
+    instagramHandle: 'thekuldeepsinghania',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoKuldeep2,
@@ -193,6 +207,7 @@ export const influencerVideos = [
     id: 'vid-kuldeep3',
     title: 'Campaign — Kuldeep Singhania (Reel 3)',
     creator: 'Kuldeep Singhania',
+    instagramHandle: 'thekuldeepsinghania',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoKuldeep3,
@@ -205,6 +220,7 @@ export const influencerVideos = [
     id: 'vid-rajat',
     title: 'Campaign — Rajat',
     creator: 'Rajat',
+    instagramHandle: 'rajat_9629',
     platform: 'Instagram',
     aspectRatio: '9:16',
     videoSrc: videoRajat,
@@ -217,6 +233,7 @@ export const influencerVideos = [
     id: 'vid-jj',
     title: 'Campaign — JJ Mobile World',
     creator: 'JJ Mobile World',
+    instagramHandle: 'jj_mobile_world',
     platform: 'YouTube',
     aspectRatio: '9:16',
     videoSrc: videoJJ,
@@ -228,8 +245,8 @@ export const influencerVideos = [
 ]
 
 // Featured = first video (Jannat), grid = next 6, allVideos = everything
-export const featuredVideo  = influencerVideos[0]
-export const gridVideos     = influencerVideos.slice(1, 7)
-export const allVideos      = influencerVideos
+export const featuredVideo = influencerVideos[0]
+export const gridVideos = influencerVideos.slice(1, 7)
+export const allVideos = influencerVideos
 
 export const galleryImages = []

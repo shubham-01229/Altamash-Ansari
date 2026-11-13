@@ -1,10 +1,10 @@
-﻿// src/pages/Media.jsx
+// src/pages/Media.jsx
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Play, Pause, X, Volume2, VolumeX,
   ChevronLeft, ChevronRight,
-  Instagram, Youtube,
+  Instagram,
 } from 'lucide-react'
 import GlassCard from '../components/ui/GlassCard'
 import SectionHeading from '../components/ui/SectionHeading'
@@ -13,16 +13,42 @@ import { fadeUp, staggerContainer } from '../hooks/useScrollReveal'
 import { allVideos } from '../data/media'
 import { cn } from '../utils/cn'
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   3D CYLINDER CAROUSEL
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
-function CylinderCarousel({ videos, onPlay }) {
+/* ——— Creator Avatar with fallback ——— */
+function CreatorAvatar({ handle, name, size = 24 }) {
+  const [imgError, setImgError] = useState(false)
+  const avatarUrl = `https://unavatar.io/instagram/${handle}`
+
+  return (
+    <div
+      className="rounded-full overflow-hidden bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0"
+      style={{ width: size, height: size }}
+    >
+      {!imgError ? (
+        <img
+          src={avatarUrl}
+          alt={name}
+          className="w-full h-full object-cover"
+          onError={() => setImgError(true)}
+          loading="lazy"
+        />
+      ) : (
+        <span className="text-primary font-bold" style={{ fontSize: size * 0.375 }}>
+          {name[0]}
+        </span>
+      )}
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════
+   3D CYLINDER CAROUSEL — preview only, no play on click
+   ═══════════════════════════════════════════════════ */
+function CylinderCarousel({ videos }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isAuto, setIsAuto] = useState(true)
   const count = videos.length
   const angleStep = 360 / count
-  // Radius so cards don't overlap: cardWidth ~150px, need arc > cardWidth
-  const radius = Math.max(420, (150 * count) / (2 * Math.PI))
+  const radius = Math.max(380, (140 * count) / (2 * Math.PI))
 
   // Auto-rotate
   useEffect(() => {
@@ -47,7 +73,7 @@ function CylinderCarousel({ videos, onPlay }) {
       {/* Carousel viewport */}
       <div
         className="relative mx-auto overflow-hidden"
-        style={{ height: '420px', perspective: '1200px' }}
+        style={{ height: '340px', perspective: '1200px' }}
         onMouseEnter={() => setIsAuto(false)}
         onMouseLeave={() => setIsAuto(true)}
       >
@@ -58,8 +84,8 @@ function CylinderCarousel({ videos, onPlay }) {
         >
           <div
             style={{
-              width: '160px',
-              height: '360px',
+              width: '140px',
+              height: '300px',
               position: 'relative',
               transformStyle: 'preserve-3d',
               transform: `rotateY(${currentRotation}deg)`,
@@ -76,11 +102,7 @@ function CylinderCarousel({ videos, onPlay }) {
                   radius={radius}
                   isActive={i === activeIndex}
                   onClick={() => {
-                    if (i === activeIndex) {
-                      onPlay(video)
-                    } else {
-                      goTo(i)
-                    }
+                    if (i !== activeIndex) goTo(i)
                   }}
                 />
               )
@@ -96,13 +118,13 @@ function CylinderCarousel({ videos, onPlay }) {
       {/* Nav arrows */}
       <button
         onClick={() => goTo(activeIndex - 1)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 transition-all"
+        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 transition-all"
       >
         <ChevronLeft size={18} />
       </button>
       <button
         onClick={() => goTo(activeIndex + 1)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 transition-all"
+        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full glass border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 transition-all"
       >
         <ChevronRight size={18} />
       </button>
@@ -119,12 +141,12 @@ function CylinderCarousel({ videos, onPlay }) {
           {videos[activeIndex].title}
         </h3>
         <p className="font-body text-white/50 text-sm">
-          {videos[activeIndex].creator} Â· {videos[activeIndex].brand}
+          {videos[activeIndex].creator} · {videos[activeIndex].brand}
         </p>
       </motion.div>
 
       {/* Dot indicators */}
-      <div className="flex justify-center gap-1.5 mt-4">
+      <div className="flex justify-center gap-1.5 mt-4 flex-wrap px-4">
         {videos.map((_, i) => (
           <button
             key={i}
@@ -142,36 +164,33 @@ function CylinderCarousel({ videos, onPlay }) {
   )
 }
 
-/* Single card on the cylinder surface */
+/* Single card on the cylinder surface — muted preview only */
 function CylinderCard({ video, angle, radius, isActive, onClick }) {
   const videoRef = useRef(null)
-  const [hovering, setHovering] = useState(false)
 
   useEffect(() => {
     if (!videoRef.current) return
-    if (hovering || isActive) {
+    if (isActive) {
       videoRef.current.currentTime = 0
-      videoRef.current.play().catch(() => {})
+      videoRef.current.play().catch(() => { })
     } else {
       videoRef.current.pause()
     }
-  }, [hovering, isActive])
+  }, [isActive])
 
   return (
     <div
       className="absolute left-1/2 top-1/2 cursor-pointer"
       style={{
-        width: '160px',
-        height: '284px', // 9:16 ratio
-        marginLeft: '-80px',
-        marginTop: '-142px',
+        width: '140px',
+        height: '187px',
+        marginLeft: '-70px',
+        marginTop: '-93px',
         transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
         transformStyle: 'preserve-3d',
         transition: 'transform 0.4s ease',
       }}
       onClick={onClick}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
     >
       <div
         className={cn(
@@ -192,78 +211,35 @@ function CylinderCard({ video, angle, radius, isActive, onClick }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
-        {/* Play icon */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className={cn(
-              'w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center transition-all duration-300',
-              isActive
-                ? 'scale-110 bg-primary/60'
-                : 'opacity-70 hover:opacity-100',
-            )}
-          >
-            <Play size={16} className="text-white ml-0.5" fill="white" />
-          </div>
-        </div>
-
         {/* Creator name */}
         <div className="absolute bottom-2 left-2 right-2">
           <p className="text-white text-[10px] font-heading font-bold truncate text-center">
             {video.creator}
           </p>
         </div>
-
-        {/* Platform badge */}
-        <div className="absolute top-2 left-2 glass border border-white/20 rounded-full px-1.5 py-0.5 flex items-center gap-1">
-          {video.platform.includes('Instagram') ? (
-            <Instagram size={8} className="text-pink-400" />
-          ) : (
-            <Youtube size={8} className="text-red-400" />
-          )}
-        </div>
       </div>
     </div>
   )
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   9:16 VIDEO CARD for the grid
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════
+   VIDEO CARD — static thumbnail, click to open modal
+   No platform badge, Instagram handle instead of "Watch Campaign"
+   ═══════════════════════════════════════════════════ */
 function VideoCard({ video, onPlay }) {
-  const videoRef = useRef(null)
-  const [hovering, setHovering] = useState(false)
-
-  const handleMouseEnter = () => {
-    setHovering(true)
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0
-      videoRef.current.play().catch(() => {})
-    }
-  }
-  const handleMouseLeave = () => {
-    setHovering(false)
-    if (videoRef.current) {
-      videoRef.current.pause()
-      videoRef.current.currentTime = 0
-    }
-  }
-
   return (
     <div
       className="group cursor-pointer h-full"
       onClick={() => onPlay(video)}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       <GlassCard className="p-0 overflow-hidden h-full flex flex-col hover:border-white/30 transition-all duration-300">
-        {/* 9:16 Video Preview */}
-        <div className="relative overflow-hidden bg-navy shrink-0 aspect-[9/16]">
+        {/* 3:4 Static Thumbnail */}
+        <div className="relative overflow-hidden bg-navy shrink-0 aspect-[3/4]">
           <video
-            ref={videoRef}
             src={video.videoSrc}
             muted
             playsInline
-            preload="none"
+            preload="metadata"
             className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -275,26 +251,10 @@ function VideoCard({ video, onPlay }) {
             </div>
           </div>
 
-          {/* Platform badge */}
-          <div className="absolute top-3 left-3 glass border border-white/20 rounded-full px-2.5 py-1 flex items-center gap-1.5">
-            {video.platform.includes('Instagram') ? (
-              <Instagram size={10} className="text-pink-400" />
-            ) : (
-              <Youtube size={10} className="text-red-400" />
-            )}
-            <span className="font-heading text-[9px] font-bold tracking-widest uppercase text-white/80">
-              {video.platform.split(' ')[0]}
-            </span>
-          </div>
-
-          {/* Creator name overlay at bottom */}
+          {/* Creator avatar + name overlay at bottom */}
           <div className="absolute bottom-3 left-3 right-3">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-                <span className="text-primary font-bold text-[9px]">
-                  {video.creator[0]}
-                </span>
-              </div>
+              <CreatorAvatar handle={video.instagramHandle} name={video.creator} size={24} />
               <span className="font-heading font-semibold text-white text-xs truncate">
                 {video.creator}
               </span>
@@ -303,7 +263,7 @@ function VideoCard({ video, onPlay }) {
         </div>
 
         {/* Card Info */}
-        <div className="flex flex-col gap-2 p-4">
+        <div className="flex flex-col gap-2 p-3 sm:p-4">
           <div className="flex flex-wrap gap-1.5">
             {video.tags.map((tag) => (
               <span
@@ -319,21 +279,28 @@ function VideoCard({ video, onPlay }) {
             {video.title}
           </h3>
 
-          <div className="flex items-center gap-1.5 text-primary/70 group-hover:text-primary transition-colors mt-auto">
-            <Play size={11} fill="currentColor" />
-            <span className="font-heading font-semibold text-[10px] tracking-widest uppercase">
-              Watch Campaign
+          {/* Instagram handle link */}
+          <a
+            href={`https://www.instagram.com/${video.instagramHandle}/`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-white/50 hover:text-pink-400 transition-colors mt-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Instagram size={12} className="text-pink-400/70" />
+            <span className="font-heading font-semibold text-[10px] tracking-wide">
+              @{video.instagramHandle}
             </span>
-          </div>
+          </a>
         </div>
       </GlassCard>
     </div>
   )
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   FULL VIDEO PLAYER MODAL
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════
+   FULL VIDEO PLAYER MODAL — auto-plays on open, fixed audio bug
+   ═══════════════════════════════════════════════════ */
 function VideoModal({ video, onClose, onPrev, onNext, hasPrev, hasNext }) {
   const videoRef = useRef(null)
   const [playing, setPlaying] = useState(false)
@@ -341,15 +308,30 @@ function VideoModal({ video, onClose, onPrev, onNext, hasPrev, hasNext }) {
   const [progress, setProgress] = useState(0)
   const [duration, setDuration] = useState(0)
 
+  // Auto-play on open / video change, clean up previous audio
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current
-        .play()
-        .then(() => setPlaying(true))
-        .catch(() => {})
-    }
-    return () => {
-      if (videoRef.current) videoRef.current.pause()
+    setPlaying(false)
+    setProgress(0)
+    setDuration(0)
+    setMuted(false)
+
+    const vid = videoRef.current
+    if (vid) {
+      // Force reload and play
+      vid.load()
+      const playWhenReady = () => {
+        vid.play()
+          .then(() => setPlaying(true))
+          .catch(() => { })
+      }
+      vid.addEventListener('canplay', playWhenReady, { once: true })
+
+      return () => {
+        vid.removeEventListener('canplay', playWhenReady)
+        vid.pause()
+        vid.removeAttribute('src')
+        vid.load()
+      }
     }
   }, [video.id])
 
@@ -373,7 +355,7 @@ function VideoModal({ video, onClose, onPrev, onNext, hasPrev, hasNext }) {
       videoRef.current.pause()
       setPlaying(false)
     } else {
-      videoRef.current.play()
+      videoRef.current.play().catch(() => { })
       setPlaying(true)
     }
   }
@@ -417,7 +399,7 @@ function VideoModal({ video, onClose, onPrev, onNext, hasPrev, hasNext }) {
             e.stopPropagation()
             onPrev()
           }}
-          className="absolute left-4 md:left-8 z-20 w-11 h-11 rounded-full glass border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 transition-all"
+          className="absolute left-2 sm:left-4 md:left-8 z-20 w-11 h-11 rounded-full glass border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 transition-all"
         >
           <ChevronLeft size={20} />
         </button>
@@ -428,7 +410,7 @@ function VideoModal({ video, onClose, onPrev, onNext, hasPrev, hasNext }) {
             e.stopPropagation()
             onNext()
           }}
-          className="absolute right-4 md:right-8 z-20 w-11 h-11 rounded-full glass border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 transition-all"
+          className="absolute right-2 sm:right-4 md:right-8 z-20 w-11 h-11 rounded-full glass border border-white/20 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 transition-all"
         >
           <ChevronRight size={20} />
         </button>
@@ -448,7 +430,7 @@ function VideoModal({ video, onClose, onPrev, onNext, hasPrev, hasNext }) {
         <div
           className={cn(
             'relative rounded-3xl overflow-hidden bg-black shadow-panel',
-            isVertical ? 'aspect-[9/16] max-h-[75vh]' : 'aspect-video',
+            isVertical ? 'aspect-[3/4] max-h-[75vh]' : 'aspect-video',
           )}
         >
           <video
@@ -512,13 +494,20 @@ function VideoModal({ video, onClose, onPrev, onNext, hasPrev, hasNext }) {
         </div>
 
         <div className="glass border border-white/10 rounded-2xl mt-3 px-5 py-3 flex items-center gap-4">
+          <CreatorAvatar handle={video.instagramHandle} name={video.creator} size={28} />
           <div className="flex-1 min-w-0">
             <h3 className="font-heading font-bold text-white text-sm truncate">
               {video.title}
             </h3>
-            <p className="font-body text-white/50 text-xs">
-              {video.creator} Â· {video.brand}
-            </p>
+            <a
+              href={`https://www.instagram.com/${video.instagramHandle}/`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-body text-white/50 text-xs hover:text-pink-400 transition-colors flex items-center gap-1"
+            >
+              <Instagram size={10} className="text-pink-400/70" />
+              @{video.instagramHandle}
+            </a>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {video.tags.map((tag) => (
@@ -532,23 +521,23 @@ function VideoModal({ video, onClose, onPrev, onNext, hasPrev, hasNext }) {
           </div>
         </div>
 
-        <p className="text-center text-white/25 text-[10px] font-body mt-2 tracking-wide">
-          â† â†’ to navigate Â· Space to play/pause Â· Esc to close
+        <p className="text-center text-white/25 text-[10px] font-body mt-2 tracking-wide hidden sm:block">
+          ← → to navigate · Space to play/pause · Esc to close
         </p>
       </motion.div>
     </motion.div>
   )
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════
    MAIN PAGE
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ═══════════════════════════════════════════════════ */
 export default function Media() {
   const [activeVideo, setActiveVideo] = useState(null)
   const [showAll, setShowAll] = useState(false)
 
-  const gridVideos = showAll ? allVideos : allVideos.slice(0, 6)
-  const hasMoreVideos = allVideos.length > 6
+  const gridVideos = showAll ? allVideos : allVideos.slice(0, 8)
+  const hasMoreVideos = allVideos.length > 8
 
   const currentIndex = activeVideo
     ? allVideos.findIndex((v) => v.id === activeVideo.id)
@@ -567,7 +556,7 @@ export default function Media() {
   return (
     <div className="min-h-screen pt-28 pb-24">
       <div className="max-w-6xl mx-auto px-4 space-y-16">
-        {/* â”€â”€ PAGE HEADER â”€â”€ */}
+        {/* —— PAGE HEADER —— */}
         <motion.div
           className="text-center"
           initial={{ opacity: 0, y: 24 }}
@@ -577,21 +566,21 @@ export default function Media() {
           <span className="section-overline block mb-4">
             Creator Collaborations
           </span>
-          <h1 className="font-heading font-bold text-white text-4xl md:text-5xl lg:text-6xl leading-tight mb-4">
+          <h1 className="font-heading font-bold text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight mb-4">
             Influencer Media
             <br />
             <span className="text-primary">Gallery</span>
           </h1>
-          <p className="font-body text-white/60 text-base max-w-xl mx-auto leading-relaxed">
+          <p className="font-body text-white/60 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
             Real campaigns. Real creators. Real results. A showcase of
             influencer collaborations managed by Altamash Ansari for Offerzone
             and partner brands.
           </p>
         </motion.div>
 
-        {/* â”€â”€ STATS STRIP â”€â”€ */}
+        {/* —— STATS STRIP —— */}
         <motion.div
-          className="flex flex-wrap justify-center gap-3"
+          className="flex flex-wrap justify-center gap-2 sm:gap-3"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -599,40 +588,40 @@ export default function Media() {
           {[
             { label: `${allVideos.length}+ Campaign Videos` },
             { label: 'Top Indian Creators' },
-            { label: 'Offerzone Ã— Partner Brands' },
+            { label: 'Offerzone × Partner Brands' },
             { label: '15M+ Subscriber Reach' },
           ].map(({ label }) => (
             <div
               key={label}
-              className="glass border border-white/10 rounded-full px-5 py-2.5"
+              className="glass border border-white/10 rounded-full px-3 sm:px-5 py-2 sm:py-2.5"
             >
-              <span className="font-heading font-semibold text-white/80 text-sm">
+              <span className="font-heading font-semibold text-white/80 text-xs sm:text-sm">
                 {label}
               </span>
             </div>
           ))}
         </motion.div>
 
-        {/* â”€â”€ 3D CYLINDER CAROUSEL â”€â”€ */}
+        {/* —— 3D CYLINDER CAROUSEL —— */}
         <section>
           <SectionHeading
             overline="Featured Campaigns"
             heading="Campaign Showcase"
-            subtitle="Scroll through all creator collaborations â€” click any video to watch."
+            subtitle="Scroll through all creator collaborations."
             align="center"
             className="mb-8"
           />
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.7 }}
           >
-            <CylinderCarousel videos={allVideos} onPlay={openVideo} />
+            <CylinderCarousel videos={allVideos} />
           </motion.div>
         </section>
 
-        {/* â”€â”€ ALL VIDEOS GRID (9:16) â”€â”€ */}
+        {/* —— ALL VIDEOS GRID (3:4) —— */}
         <section>
           <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
             <SectionHeading
@@ -641,13 +630,13 @@ export default function Media() {
             />
             <div className="flex items-center gap-2 text-white/50 text-xs font-body">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span>Hover to preview Â· Click to watch</span>
+              <span>Click to watch</span>
             </div>
           </div>
 
           <motion.div
             key={showAll ? 'grid-all' : 'grid-partial'}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5"
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5"
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
@@ -667,13 +656,13 @@ export default function Media() {
               >
                 {showAll
                   ? 'Show Less'
-                  : `Show All ${allVideos.length} Videos`}
+                  : 'Show More'}
               </PrimaryButton>
             </div>
           )}
         </section>
 
-        {/* â”€â”€ CREATOR ROSTER â”€â”€ */}
+        {/* —— CREATOR ROSTER —— */}
         <section>
           <SectionHeading
             overline="Creator Network"
@@ -683,44 +672,45 @@ export default function Media() {
             className="mb-8"
           />
           <motion.div
-            className="flex flex-wrap justify-center gap-3"
+            className="flex flex-wrap justify-center gap-2 sm:gap-3"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
           >
             {[
-              'Jannat Zubair',
-              'Elvish Yadav',
-              'Faisu (Mr. Faisu)',
-              'Aman Sharma',
-              'Shivam Malik',
-              'Kuldeep Singhania',
-              'Kataria',
-              'Nazim Ahmed',
-              'Zayn',
-              'Sajid Shaikh',
-              'Rajat',
-              'JJ Mobile World',
-              'A2 Motivation',
-            ].map((name, i) => (
-              <motion.div key={name} variants={fadeUp} custom={i * 0.04}>
-                <div className="glass border border-white/10 rounded-full px-4 py-2 flex items-center gap-2 hover:border-primary/30 hover:bg-primary/5 transition-all duration-200">
-                  <div className="w-5 h-5 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-                    <span className="text-primary font-bold text-[9px]">
-                      {name[0]}
-                    </span>
-                  </div>
-                  <span className="font-heading font-semibold text-white/70 text-xs hover:text-white transition-colors">
-                    {name}
+              { name: 'Jannat Zubair', handle: 'jannatzubair29' },
+              { name: 'Elvish Yadav', handle: 'elvish_yadav' },
+              { name: 'Faisu (Mr. Faisu)', handle: 'mr_faisu_07' },
+              { name: 'Aman Sharma', handle: 'amansharma_0000' },
+              { name: 'Shivam Malik', handle: 'shivammalik09' },
+              { name: 'Kuldeep Singhania', handle: 'thekuldeepsinghania' },
+              { name: 'Kataria', handle: 'corrupt_tuber' },
+              { name: 'Nazim Ahmed', handle: 'nazim4hmed' },
+              { name: 'Zayn', handle: 'round2hell' },
+              { name: 'Sajid Shaikh', handle: 'its_sajid_shaikh' },
+              { name: 'Rajat', handle: 'rajat_9629' },
+              { name: 'JJ Mobile World', handle: 'jj_mobile_world' },
+              { name: 'A2 Motivation', handle: 'arvind.aroraj' },
+            ].map((creator, i) => (
+              <motion.div key={creator.name} variants={fadeUp} custom={i * 0.04}>
+                <a
+                  href={`https://www.instagram.com/${creator.handle}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="glass border border-white/10 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 flex items-center gap-2 hover:border-pink-400/30 hover:bg-pink-400/5 transition-all duration-200"
+                >
+                  <CreatorAvatar handle={creator.handle} name={creator.name} size={20} />
+                  <span className="font-heading font-semibold text-white/70 text-[11px] sm:text-xs hover:text-white transition-colors">
+                    {creator.name}
                   </span>
-                </div>
+                </a>
               </motion.div>
             ))}
           </motion.div>
         </section>
 
-        {/* â”€â”€ WORK WITH ME CTA â”€â”€ */}
+        {/* —— WORK WITH ME CTA —— */}
         <section>
           <GlassCard
             variant="featured"
@@ -729,13 +719,13 @@ export default function Media() {
             <span className="section-overline block mb-4">
               Start a Campaign
             </span>
-            <h2 className="font-heading font-bold text-white text-3xl md:text-4xl leading-tight mb-3">
+            <h2 className="font-heading font-bold text-white text-2xl sm:text-3xl md:text-4xl leading-tight mb-3">
               Want Your Brand Featured
               <br />
               with Top Creators?
             </h2>
             <p className="font-body text-white/60 text-sm leading-relaxed mb-7 max-w-sm mx-auto">
-              I manage end-to-end influencer campaigns â€” from creator sourcing
+              I manage end-to-end influencer campaigns – from creator sourcing
               and negotiation to delivery and reporting.
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
@@ -750,7 +740,7 @@ export default function Media() {
         </section>
       </div>
 
-      {/* â”€â”€ VIDEO PLAYER MODAL â”€â”€ */}
+      {/* —— VIDEO PLAYER MODAL —— */}
       <AnimatePresence>
         {activeVideo && (
           <VideoModal
